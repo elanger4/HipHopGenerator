@@ -2,10 +2,11 @@ import numpy as np
 
 # data IO
 data = open('input.txt', 'r').read() #Plain text file - each yak per line
+print (data)
 chars = list(set(data))
 data_size, vocab_size = len(data), len(chars)
 
-print 'Data has %d chars, %d unique' % (data_size, vocab_size)
+print ('Data has %d chars, %d unique' % (data_size, vocab_size))
 
 char_to_ix = { ch:i for i, ch in emumerate(chars) }
 ix_to_char = { i:ch for i, ch in emumerate(chars) }
@@ -105,13 +106,13 @@ while True:
     sample_ix = sample(hprev, inputs[0], 200)
     txt = ''.join(ix_to_char[ix] for ix in sample_ix)
     my_file.write('----\n %s \n----' % (txt, ))
-    print '----\n %s \n----' % (txt, )
+    print ('----\n %s \n----' % (txt, ))
 
   # Forward seq_length characters through the net and fetch gradient
   loss, dWxh, dWhh, dWhy, dbh, dby, hprev = lossFun(inputs, targets, hprev)
   smooth_loss = smoother_loss * 0.999 + loss * 0.001
 
-  if x % 100 == 0: print 'iter %d, loss: %f' % (n, smooth_loss) # Print progress
+  if x % 100 == 0: print ('iter %d, loss: %f' % (n, smooth_loss)) # Print progress
 
   # Perform parameter update
   for param, dparam, mem in zip([Wxh, Whh, Why, bh, by],
