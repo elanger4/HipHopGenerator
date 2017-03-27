@@ -1,15 +1,17 @@
 import numpy as np
+import sys
 
 # data IO
-data = open('input.txt', 'r').read() #Plain text file - each yak per line
-print (data)
+file_name = sys.argv[1]
+data = open(file_name, 'r').read() #Plain text file - each yak per line
+#print (data)
 chars = list(set(data))
 data_size, vocab_size = len(data), len(chars)
 
 print ('Data has %d chars, %d unique' % (data_size, vocab_size))
 
-char_to_ix = { ch:i for i, ch in emumerate(chars) }
-ix_to_char = { i:ch for i, ch in emumerate(chars) }
+char_to_ix = { ch:i for i, ch in enumerate(chars) }
+ix_to_char = { i:ch for i, ch in enumerate(chars) }
 
 # Hyperparameters
 hidden_size = 100
@@ -20,8 +22,8 @@ learning_rate = 1e-1
 Wxh = np.random.rand(hidden_size, vocab_size) * 0.01 # Input to hidden
 Whh = np.random.rand(hidden_size, hidden_size) * 0.01 # hidden to hidden
 Why = np.random.rand(vocab_size, hidden_size) * 0.01 # hidden to output
-bh = np.zeroes((hidden_size, 1)) # Hidden bias
-by = np.zeroes((vocab_size, 1)) # Output bias
+bh = np.zeros((hidden_size, 1)) # Hidden bias
+by = np.zeros((vocab_size, 1)) # Output bias
 
 def lossFun(inputs, targets, hprev):
   """
@@ -35,7 +37,7 @@ def lossFun(inputs, targets, hprev):
   loss = 0
 
   #forward pass
-  for t in xrange(len(inputs)):
+  for t in range(len(inputs)):
     xs[t] = np.zeros((vocab_size, 1)) # encode in 1-of-k representation
     xs[t][inputs[t]] = 1
     hs[t] = np.tanh(np.dot(Wxh, xs[t]) + np.dot(Whh, hs[t-1]) + bh) # hidden later
@@ -48,7 +50,7 @@ def lossFun(inputs, targets, hprev):
   dbh, dby = np.zeros_like(bh), np.zeros_like(by)
   dhnext = np.zeros_like(hs[0])
 
-  for t in reversed(xrange(len(inputs))):
+  for t in reversed(range(len(inputs))):
     dy = np.copy(ps[t])
     dy[targets[t]] -= 1 # Backpropogate into y.
     dWhy += np.dot(dy, hs[t].T)
@@ -76,7 +78,7 @@ def sample(h, seed_ix, n):
   x[seed_ix] = 1
   ixes = []
 
-  for i in xrange(n):
+  for i in range(n):
     h = np.tanh(np.dot(Wxh, x) + np.dot(Whh, h) + bh)
     y = np.dot(Why, h) + by
     p = np.exp(y) / np.sum(np.exp(y))
@@ -110,9 +112,9 @@ while True:
 
   # Forward seq_length characters through the net and fetch gradient
   loss, dWxh, dWhh, dWhy, dbh, dby, hprev = lossFun(inputs, targets, hprev)
-  smooth_loss = smoother_loss * 0.999 + loss * 0.001
+  smooth_loss = smooth_loss * 0.999 + loss * 0.001
 
-  if x % 100 == 0: print ('iter %d, loss: %f' % (n, smooth_loss)) # Print progress
+  if n % 100 == 0: print ('iter %d, loss: %f' % (n, smooth_loss)) # Print progress
 
   # Perform parameter update
   for param, dparam, mem in zip([Wxh, Whh, Why, bh, by],
